@@ -47,6 +47,9 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password)
+      return res.json({ error: true, message: " No Empty Fields allowed " });
+
     const user = await userModel.findOne({ email });
     // console.log(user);
     // if no user exists -> null
@@ -56,12 +59,30 @@ const loginUser = async (req, res) => {
     if (!isPasswordMatch)
       return res.json({ error: true, message: "Invalid Credentials" });
 
-    const token=await generateToken(user._id+user.email+user.password);
+    const token = await generateToken(user._id);
 
-    return res.status(200).json({error:false,message:'Login Success',token:token});
+    return res
+      .status(200)
+      .json({ error: false, message: "Login Success", token: token });
   } catch (error) {
     console.log("Error in login User Function", error);
     return res.json({ error: true, message: "Login Failed" });
   }
 };
-module.exports = { registerUser, loginUser };
+const currentUser=async(req,res)=>{
+  try {
+
+    const user=await userModel.findById(req.user).select('-password');
+    if(!user)
+        return res.json({error:true,message:'No user Found'});
+    return res.json({error:false,user});
+    
+  } catch (error) {
+    console.log('Error in currentUser',error);
+    return res.json({error:true,message:'Request Failed'});
+    
+  }
+};
+
+
+module.exports = { registerUser, loginUser,currentUser };
