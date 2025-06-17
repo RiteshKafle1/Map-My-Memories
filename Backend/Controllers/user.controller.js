@@ -1,6 +1,7 @@
 const userModel = require("../Models/user.model");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const generateToken = require("../Utility/generate.token");
 
 const registerUser = async (req, res) => {
   try {
@@ -42,4 +43,25 @@ const registerUser = async (req, res) => {
     return res.json({ error: true, message: "Failed to create Account" });
   }
 };
-module.exports = { registerUser };
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await userModel.findOne({ email });
+    // console.log(user);
+    // if no user exists -> null
+    if (!user) return res.json({ error: true, message: "No User Found" });
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    // if password donot match -> false
+    if (!isPasswordMatch)
+      return res.json({ error: true, message: "Invalid Credentials" });
+
+    const token=await generateToken(user._id+user.email+user.password);
+
+    return res.status(200).json({error:false,message:'Login Success',token:token});
+  } catch (error) {
+    console.log("Error in login User Function", error);
+    return res.json({ error: true, message: "Login Failed" });
+  }
+};
+module.exports = { registerUser, loginUser };
