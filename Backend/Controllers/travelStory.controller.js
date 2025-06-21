@@ -1,5 +1,6 @@
 const travelModel = require("../Models/travel.model");
 const cloudinary = require("../Config/cloud.config");
+const userModel = require("../Models/user.model");
 
 const addTravelStory = async (req, res) => {
   try {
@@ -44,4 +45,19 @@ const addTravelStory = async (req, res) => {
   }
 };
 
-module.exports = { addTravelStory };
+const userTravelStory = async (req, res) => {
+  try {
+    const TravelStory = await travelModel
+      .find({ userId: req.user })
+      .sort({ createdAt: -1 });
+
+    if (!TravelStory.length)
+      return res.json({ error: true, message: "No story found" });
+
+    return res.json({ error: false, TravelStory });
+  } catch (error) {
+    console.log("Error in userTravelstory", error);
+    res.json({ error: true, message: "Failed to fetch the user story" });
+  }
+};
+module.exports = { addTravelStory, userTravelStory };
