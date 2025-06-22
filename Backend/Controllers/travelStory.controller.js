@@ -177,10 +177,27 @@ const searchTravelStory = async (req, res) => {
   }
 };
 
+const filterByDate = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    const filteredResult = await travelModel.find({
+      visitedDate: { $gte: startDate, $lte: endDate },
+    });
+    if (filteredResult) return res.json({ error: false, filteredResult });
+    else return res.json({ error: true, message: "No post found" });
+  } catch (error) {
+    console.log("Error in filtering through date", error);
+    return res.json({ error: true, message: "falied to find" });
+  }
+};
+
 module.exports = {
   addTravelStory,
   userTravelStory,
   editTravelStory,
   delTravelStory,
-  updateIsFavourite,searchTravelStory
+  updateIsFavourite,
+  searchTravelStory,
+  filterByDate,
 };

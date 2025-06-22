@@ -6,7 +6,7 @@ const userRouter = require("./Routes/user.routes");
 const travelRouter = require("./Routes/travelStory.routes");
 
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({extended:true}));
 app.use('/user',userRouter);
 app.use('/travel',travelRouter);
 
