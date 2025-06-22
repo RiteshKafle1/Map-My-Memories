@@ -106,4 +106,35 @@ const editTravelStory = async (req, res) => {
     return res.json({ error: true, message: "Failed to update your story" });
   }
 };
-module.exports = { addTravelStory, userTravelStory, editTravelStory };
+
+const delTravelStory = async (req, res) => {
+  try {
+    const travelId = req.params.id;
+
+    const travelStory = await travelModel.findById(travelId);
+
+    if (!travelStory)
+      return res.json({ error: true, message: "No story found" });
+    if (travelStory.userId === req.user) {
+      // await cloudinary.uploader.destroy(publicId);
+
+     const story= await travelStory.deleteOne();
+      return res.json({
+        error: false,
+        message: "Story deleted success",
+        story,
+      });
+    } else {
+      return res.json({ error: true, message: "Failed to delete story" });
+    }
+  } catch (error) {
+    console.log("Error in deleting travel story", error);
+    return res.json({ error: true, message: "Failed to delete story" });
+  }
+};
+module.exports = {
+  addTravelStory,
+  userTravelStory,
+  editTravelStory,
+  delTravelStory,
+};
