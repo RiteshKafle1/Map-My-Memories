@@ -78,27 +78,29 @@ const editTravelStory = async (req, res) => {
       imageUrl = image.secure_url;
     }
     const TravelStory = await travelModel.findById(storyId);
-
-    // console.log(TravelStory);
-
     if (!TravelStory)
       return res.json({ error: true, message: "No story found" });
 
-    TravelStory.title = title || TravelStory.title;
-    TravelStory.story = story || TravelStory.story;
-    TravelStory.visitedLocation =
-      visitedLocation || TravelStory.visitedLocation;
-    TravelStory.visitedDate = visitedDate || TravelStory.visitedDate;
-    TravelStory.isFavourite = isFavourite || TravelStory.isFavourite;
-    TravelStory.image = imageUrl || TravelStory.image;
+    if (TravelStory.userId === req.user) {
+      TravelStory.title = title || TravelStory.title;
+      TravelStory.story = story || TravelStory.story;
+      TravelStory.visitedLocation =
+        visitedLocation || TravelStory.visitedLocation;
+      TravelStory.visitedDate = visitedDate || TravelStory.visitedDate;
+      TravelStory.isFavourite = isFavourite || TravelStory.isFavourite;
+      TravelStory.image = imageUrl || TravelStory.image;
 
-    const updatedStory = await TravelStory.save();
+      const updatedStory = await TravelStory.save();
+      return res.json({
+        error: false,
+        message: " Travel story Updated",
+        updatedStory,
+      });
+    } else {
+      return res.json({ error: true, message: "Failed to update your story" });
+    }
 
-    return res.json({
-      error: false,
-      message: " Travel story Updated",
-      updatedStory,
-    });
+    // console.log(TravelStory);
   } catch (error) {
     console.log("Error in editing travel story", error);
     return res.json({ error: true, message: "Failed to update your story" });
