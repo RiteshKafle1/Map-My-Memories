@@ -118,7 +118,7 @@ const delTravelStory = async (req, res) => {
     if (travelStory.userId === req.user) {
       // await cloudinary.uploader.destroy(publicId);
 
-     const story= await travelStory.deleteOne();
+      const story = await travelStory.deleteOne();
       return res.json({
         error: false,
         message: "Story deleted success",
@@ -132,9 +132,55 @@ const delTravelStory = async (req, res) => {
     return res.json({ error: true, message: "Failed to delete story" });
   }
 };
+
+const updateIsFavourite = async (req, res) => {
+  try {
+    const travelId = req.params.storyId;
+    const { isFavourite } = req.body;
+    const travelStory = await travelModel.findById(travelId);
+
+    if (!travelStory)
+      return res.json({ error: true, message: "No story found" });
+
+    if (travelStory.userId === req.user) {
+      travelStory.isFavourite = isFavourite || travelStory.isFavourite;
+      const newStory = await travelStory.save();
+      return res.json({ error: false, message: "Updated story", newStory });
+    }
+  } catch (error) {
+    console.log("Error in updating the isfavourite function", error);
+    return res.json({ error: true, message: "Failed to update" });
+  }
+};
+
+const searchTravelStory = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const searchedResults = await travelModel
+      .find({
+        $or: [
+          {
+            title: { $regex: query, $options: "i" },
+            story: { $regex: query, $options: "i" },
+            visitedLocation: { $regex: query, $options: "i" },
+            visitedDate: { $regex: query, $options: "i" },
+          },
+        ],
+      })
+      .sort({ createdAt: 1 });
+
+    if (searchedResults) return res.json({ error: false, searchedResults });
+    else return res.json({ error: true, message: "No Result Found" });
+  } catch (error) {
+    console.log("Error in searching travel story", error);
+    return res.json({ error: true, message: "failed to search the story" });
+  }
+};
+
 module.exports = {
   addTravelStory,
   userTravelStory,
   editTravelStory,
   delTravelStory,
+  updateIsFavourite,searchTravelStory
 };
