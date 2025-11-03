@@ -182,7 +182,7 @@ GET /api/stories/filter?startDate=2025-01-01&endDate=2025-12-31
 
 ---
 
-## 👩‍💻 Author
+## 🧑‍💻 Author
 
 **Ritesh Kafle**
 💻 Backend Developer | 🌏 Passion for Scalable APIs
